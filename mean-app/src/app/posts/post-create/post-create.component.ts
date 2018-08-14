@@ -12,6 +12,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 export class PostCreateComponent implements OnInit {
   enteredContent = '';
   enteredTitile = '';
+  isLoading = false;
 
   private mode = 'create';
   private postId: string;
@@ -25,7 +26,9 @@ export class PostCreateComponent implements OnInit {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
         this.postId = paramMap.get('postId');
+        this.isLoading = true;
         this.post = this.postsService.getPost(this.postId);
+        this.isLoading = false;
       } else {
         this.mode = 'create';
         this.postId = null;
@@ -39,6 +42,7 @@ export class PostCreateComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     if (this.mode === 'create') {
 
       this.postsService.addPost(
