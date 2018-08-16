@@ -24,5 +24,12 @@
     </mat-form-field>
 
     <button mat-raised-button color="primary" type="submit">Save Post</button>
+    <button
+      mat-stroked-button
+      type="button"
+      style="float: right;"
+      (click)="filePicker.click()"
+      >Pick Image</button>
+    <input type="file" #filePicker>
   </form>
 </mat-card>
