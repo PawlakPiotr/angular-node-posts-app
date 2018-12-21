@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { PostListComponent } from './post-list/post-list.component';
 
 @Injectable({providedIn: 'root'})
 export class PostService {
@@ -20,7 +21,8 @@ export class PostService {
           return {
             title: post.title,
             content: post.content,
-            id: post._id
+            id: post._id,
+            imagePath: post.imagePath
           };
         });
       }))
@@ -38,18 +40,21 @@ export class PostService {
     return {...this.posts.find(p => p.id === id)};
   }
 
-  addPost(title: string, content: string) {
+  addPost(title: string, content: string, image: File) {
+    const postData = new FormData();
+    postData.append('title', title);
+    postData.append('content', content);
+    postData.append('image', image, title);
 
-    const post: Post = {
-      id: null,
-      title: title,
-      content: content
-    };
-
-    this.http.post<{ message: string, postId: string }>('http://localhost:3000/api/posts', post)
+    this.http.post<{ message: string, post: Post }>('http://localhost:3000/api/posts', postData)
       .subscribe( (responseData) => {
-        const id_post = responseData.postId;
-        post.id = id_post;
+        const post: Post = {
+          id: responseData.post.id,
+          title: title,
+          content: content,
+          imagePath: responseData.post.imagePath
+        };
+
         this.posts.push(post);
         this.postUpdated.next([...this.posts]);
         this.router.navigate(['/']);
@@ -57,8 +62,9 @@ export class PostService {
 
   }
 
-  updatePost(id: string, title: string, content: string) {
-    const post: Post = {id: id, title: title, content: content};
+  updatePost(id: string, title: string, content: string, image: any) {
+    const post: Post = {id: id, title: title, content: content, imagePath: image};
+
     this.http.put('http://localhost:3000/api/posts/' + id, post)
       .subscribe( response => {
         const updatedPosts = [...this.posts];

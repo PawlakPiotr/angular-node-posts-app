@@ -14,6 +14,8 @@ export class PostListComponent implements OnInit, OnDestroy {
   private postsSub: Subscription;
   isLoading = false;
 
+  imgFile: string;
+
   constructor(public postsService: PostService) {}
 
   ngOnInit() {

@@ -1,28 +1,66 @@
 const express = require('express');
+const multer = require('multer');
 
 const Post = require('../models/post');
 
 const router = express.Router();
 
-router.post("", (req,res,next) => {
+const UPLOAD_TYPE_MAP = {
+  'image/png' : 'png',
+  'image/jpeg' : 'jpg',
+  'image/jpg' : 'jpg'
+};
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const isValid = UPLOAD_TYPE_MAP[file.uploadtype];
+    let error = new Error('Invalid upload type');
+    if(isValid){
+      error = null;
+    }
+    cb(null, 'backend/images');
+  },
+  filename: (req, file, cb) => {
+    let title = req.body.title.toString().replace(' ','_');
+    title = title.replace(/ /g, '_');
+    const name ='img_' + title;
+    cb(null, name + '.' + UPLOAD_TYPE_MAP["image/jpg"]);
+  }
+});
+
+router.post("", multer({storage: storage}).single('image'), (req,res,next) => {
+  const url = req.protocol + '://' + req.get('host');
+  let title = req.body.title.toString().replace(' ','_');
+  title = title.replace(/ /g, '_');
+  const name ='img_' + title;
+  const filename = name + '.' + UPLOAD_TYPE_MAP["image/jpg"];
+
   const post = new Post({
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: url + '/images/' + filename
   });
   post.save().then(createdPost => {
     res.status(201).json({
       message: 'Post added successfully',
-      postId: createdPost._id
+      post: {
+        id: createdPost._id,
+        title: createdPost.title,
+        content: createdPost.content,
+        imagePath: createdPost.imagePath
+      }
     });
   });
 
 });
 
-router.put("/:id", (req, res, next) => {
+router.put("/:id", multer({storage: storage}).single('image'), (req, res, next) => {
+
   const post = new Post({
     _id: req.body.id,
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: req.body.imagePath
   });
   Post.updateOne({_id: req.params.id}, post)
     .then( result => {

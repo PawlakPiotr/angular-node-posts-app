@@ -10,3 +10,13 @@ mat-spinner {
 .info-text {
   text-align: center;
 }
+
+.img-preview {
+  height: 5rem;
+  margin: 1rem 0;
+}
+
+.img-preview img {
+  height: 100%;
+  border-radius: 5px;
+}
