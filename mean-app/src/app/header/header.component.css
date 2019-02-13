@@ -1,7 +1,7 @@
 ul {
   list-style: none;
   padding: 0;
-  margin: 0
+  margin: 0;
 }
 
 a {
@@ -9,6 +9,14 @@ a {
   color: white;
 }
 
+ul {
+  display: flex;
+}
+
 .spacer {
   flex: 1 1 auto;
+}
+
+.mat-toolbar {
+  background:  transparent;
 }
